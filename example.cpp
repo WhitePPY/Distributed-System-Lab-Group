@@ -4,9 +4,9 @@
 #include <string>
 
 // Initialize the scoring parameters
-const int match = 1;
+const int match = 2;
 const int mismatch = -1;
-const int gap = -1;
+const int gap = 1;
 
 // Function to print the alignment
 void print_alignment(const std::string& align1, const std::string& align2) {
