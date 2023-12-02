@@ -11,3 +11,6 @@ https://github.com/giorgapost/smith-waterman-algorithm/tree/main
 clone and use, 
 from paper DSA: Scalable Distributed Sequence Alignment System Using SIMD Instructions,
 https://github.com/xubo245/DSA
+
+
+./kafka_2.13-3.6.0/bin/kafka-topics.sh --bootstrap-server localhost:9092 --alter --topic testTopic --partitions 2
