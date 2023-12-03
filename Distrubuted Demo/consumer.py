@@ -71,7 +71,7 @@ def main():
             print_alignment(alignA, alignB)
             print("Run Time:", (end_time - start_time) * 1e6, "μs")
             
-            time.sleep(0.001)
+            # time.sleep(0.001)
     except KeyboardInterrupt:
         print("Terminated")
     finally:
