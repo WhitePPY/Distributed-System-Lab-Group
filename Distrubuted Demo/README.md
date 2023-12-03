@@ -25,15 +25,20 @@
     # run server
     kafka-server-start.sh $KAFKA_HOME/config/server.properties
     # create topic and modify partitions
-    kafka-topics.sh --create --topic testTopic --partitions [NUM_OF_NODES] --replication-factor 1 --bootstrap-server localhost:9092
+    kafka-topics.sh --create --topic Topic1 --partitions [NUM_OF_NODES] --replication-factor 1 --bootstrap-server localhost:9092
+    kafka-topics.sh --create --topic Topic2 --partitions 1 --replication-factor 1 --bootstrap-server localhost:9092
     ```
 ## Run the Demo ##
 * Run Distributed Nodes
     ```bash
     # for each nodes:
-    spark-submit consumer.py
+    spark-submit processor.py
+    ```
+* Run Intergrator
+    ```bash
+    python integrator.py
     ```
 * Run Main Program
     ```bash
-    python producer.py
+    python distributor.py
     ```
