@@ -2,6 +2,8 @@ from pyspark.sql import SparkSession
 import numpy as np
 import time
 from kafka import KafkaConsumer
+import json
+from kafka import KafkaProducer
 
 def print_alignment(align1, align2):
     print(align1)
@@ -46,37 +48,42 @@ def smith_waterman(A, B, match=2, mismatch=-1, gap=1):
     return alignA, alignB, max_score
 
 def main():
+    topic1 = 'testTopic'
+    topic2 = 'Topic2'
     spark = SparkSession.builder.appName("Smith-Waterman").getOrCreate()
-
-    # Fixed sequence
-    seq1 = "GCTGCATGATATTGAAAAAATATCACCAAATAAAAAACGCCTTAGTAAGTATTTTTCAGCTTTTCATTCTGACTGCAACGGGCAATATGTCTCTGTGTGGATTAAAAAAGAGTGTCTGATAGCAGCTTCTGAACTGGTTACCTGCCGTGAGTAAATTAAAATTTTATTGACTTAGGTCACTAAATACTTTAACCAATATAGGCATAGCGCACAGACAGATAAAAATTACAGAGTACACAACATCCATGAAACGCATTAGCACCACCATTACCACCACCATCACCATTACCACAGGTAACGGTGCGGGCTGACGACGTACAGGAAACACAGAAAAAAGCCCGCTAC"
-
-    topic_name = 'testTopic'
     consumer = KafkaConsumer(
-        topic_name,
+        topic1,
         bootstrap_servers='localhost:9092',
         auto_offset_reset='earliest',
         group_id='my-group'
     )
 
+    producer = KafkaProducer(bootstrap_servers='localhost:9092')
+
     try:
         for message in consumer:
-            seq2 = message.value.decode('utf-8')
-            
+            query_dict = json.loads(message.value.decode('utf-8'))
+
             start_time = time.time()
-            alignA, alignB, max_score = smith_waterman(seq1, seq2)
+            alignA, alignB, max_score = smith_waterman(query_dict['query_value'], query_dict['target_value'])
             end_time = time.time()
 
             print("Alignment score:", max_score)
-            print_alignment(alignA, alignB)
+            final_alignment = alignA + alignB
             print("Run Time:", (end_time - start_time) * 1e6, "μs")
-            
+
             # time.sleep(0.001)
+
+            # send things to topic2
+            result_dict = {'alignment': final_alignment, 'score': str(max_score), 'cost_time': str(end_time - start_time), 'query_key': query_dict['query_key'], 'target_key': query_dict['target_key']}
+            producer.send(topic2, json.dumps(result_dict).encode('utf-8'))
+
     except KeyboardInterrupt:
         print("Terminated")
     finally:
         consumer.close()
         spark.stop()
+        producer.close()
 
 if __name__ == "__main__":
     main()
