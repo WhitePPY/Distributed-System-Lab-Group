@@ -15,12 +15,17 @@
     ```
 * Start Kafka Server
     ```bash
+    # add Kafka to PATH
+    vim ~/.bashrc
+    export KAFKA_HOME=[YOUR_PATH]/kafka_2.13-3.6.0
+    export PATH="$KAFKA_HOME/bin:$PATH"
+    source ~/.bashrc
     # run zookeeper
-    ./kafka_2.13-3.6.0/bin/zookeeper-server-start.sh kafka_2.13-3.6.0/config/zookeeper.properties
+    zookeeper-server-start.sh $KAFKA_HOME/config/zookeeper.properties
     # run server
-    ./kafka_2.13-3.6.0/bin/kafka-server-start.sh kafka_2.13-3.6.0/config/server.properties
+    kafka-server-start.sh $KAFKA_HOME/config/server.properties
     # create topic and modify partitions
-    ./kafka_2.13-3.6.0/bin/kafka-topics.sh --create --topic testTopic --partitions [NUM_OF_NODES] --replication-factor 1 --bootstrap-server localhost:9092
+    kafka-topics.sh --create --topic testTopic --partitions [NUM_OF_NODES] --replication-factor 1 --bootstrap-server localhost:9092
     ```
 ## Run the Demo ##
 * Run Distributed Nodes
