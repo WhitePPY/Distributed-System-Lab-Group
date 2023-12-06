@@ -2,11 +2,20 @@ from kafka import KafkaProducer
 import time
 from fasta_reader import read_fasta
 import json
+import configparser 
+
+config = configparser.ConfigParser()
+config.read('config.ini')
+
+topic = config['TOPIC']['query_topic']
+File1 = config['PRODUCER']['query_data_file1']  
+File2 = config['PRODUCER']['query_data_file2']
+
+bootstrap_servers = config['DEFAULT']['bootstrap_servers']
 
 def file_to_kafka(topic):
-    producer = KafkaProducer(bootstrap_servers='localhost:9092')
-    File1 = 'input.fna'
-    File2 = './GCF_001742465.1_ASM174246v1_genomic.fna'
+    producer = KafkaProducer(bootstrap_servers=bootstrap_servers)
+    
     send_list = []
 
     for item1 in read_fasta(File1):
@@ -25,5 +34,4 @@ def file_to_kafka(topic):
         producer.close()
 
 if __name__ == '__main__':
-    topic_name = 'Topic1'
-    file_to_kafka(topic_name)
+        file_to_kafka(topic)

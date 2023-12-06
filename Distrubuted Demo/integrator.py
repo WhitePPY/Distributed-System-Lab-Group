@@ -1,7 +1,22 @@
-from kafka import KafkaConsumer
+from kafka import KafkaConsumer 
+from kafka import KafkaProducer
 import json
 from fasta_reader import read_fasta
 import time
+import configparser 
+
+config = configparser.ConfigParser()
+config.read('config.ini')
+
+
+result_file = config['INTEGRATOR']['result_file']  
+
+bootstrap_servers = config['DEFAULT']['bootstrap_servers']  
+topic = config['TOPIC']['result_topic']
+timeout = float(config['INTEGRATOR']['timeout'])
+
+File1 = config['PRODUCER']['query_data_file1']  
+File2 = config['PRODUCER']['query_data_file2']
 
 def process_message(message):
     # read from encoded msg
@@ -18,24 +33,21 @@ def process_message(message):
 
 def main():
     
-    File1 = 'input.fna'
-    File2 = './GCF_001742465.1_ASM174246v1_genomic.fna'
     query_list = {}
     for item1 in read_fasta(File1):
         for item2 in read_fasta(File2):
             query_list[str(item1.defline) + '_' + str(item2.defline)] = [item1.value, item2.value]
     
-    topic = 'Topic2'
     consumer = KafkaConsumer(
         topic,
-        bootstrap_servers='localhost:9092',
+        bootstrap_servers=bootstrap_servers,
         auto_offset_reset='earliest',
         group_id='group2'
     )
     answer_list = []
     last_updated_time = time.time()
     try:
-        with open('output.txt', 'w') as file:
+        with open(result_file, 'w') as file:
             for message in consumer:
                 message_value = message.value.decode('utf-8')
                 formatted_message, key_pair = process_message(message_value)
@@ -61,7 +73,7 @@ def main():
             missing_msgs.append(msg)
 
     while len(missing_msgs) > 0:
-        producer = KafkaProducer(bootstrap_servers='localhost:9092')
+        producer = KafkaProducer(bootstrap_servers=bootstrap_servers)
         send_list = []
         for item in missing_msgs:
             send_list.append({'query_key':item.split('_')[0], 'query_value':query_list[item][0], 'target_key':item.split('_')[1], 'target_value':query_list[item][1]})
@@ -74,14 +86,14 @@ def main():
 
         consumer = KafkaConsumer(
             topic,
-            bootstrap_servers='localhost:9092',
+            bootstrap_servers=bootstrap_servers,
             auto_offset_reset='earliest',
             group_id='group2'
         )
         
         last_updated_time = time.time()
         try:
-            with open('output.txt', 'w') as file:
+            with open(result_file, 'w') as file:
                 for message in consumer:
                     message_value = message.value.decode('utf-8')
                     formatted_message, key_pair = process_message(message_value)

@@ -5,12 +5,26 @@ from kafka import KafkaConsumer
 import json
 from kafka import KafkaProducer
 import heapq
+import configparser 
+
+config = configparser.ConfigParser()
+config.read('config.ini')
+
+topic1 = config['TOPIC']['query_topic']  
+topic2 = config['TOPIC']['result_topic']
+
+top_k = int(config['PROCESSOR']['top_k'])
+match = int(config['PROCESSOR']['match_score'])
+mismatch = int(config['PROCESSOR']['mismatch_penalty'])  
+gap = int(config['PROCESSOR']['gap_penalty'])
+
+bootstrap_servers = config['DEFAULT']['bootstrap_servers']
 
 def print_alignment(align1, align2):
     print(align1)
     print(align2)
 
-def smith_waterm_topk(A, B, k = 1, match=2, mismatch=-1, gap=1):
+def smith_waterm_topk(A, B, k, match, mismatch, gap):
     n, m = len(A), len(B)
     H = np.zeros((n+1, m+1), dtype=int)
 
@@ -57,17 +71,16 @@ def smith_waterm_topk(A, B, k = 1, match=2, mismatch=-1, gap=1):
     return aligned_list
 
 def main():
-    topic1 = 'Topic1'
-    topic2 = 'Topic2'
+    
     spark = SparkSession.builder.appName("Smith-Waterman").getOrCreate()
     consumer = KafkaConsumer(
         topic1,
-        bootstrap_servers='localhost:9092',
+        bootstrap_servers=bootstrap_servers,
         auto_offset_reset='earliest',
         group_id='group1'
     )
 
-    producer = KafkaProducer(bootstrap_servers='localhost:9092')
+    producer = KafkaProducer(bootstrap_servers=bootstrap_servers)
 
     try:
         for message in consumer:
@@ -75,7 +88,7 @@ def main():
 
             start_time = time.time()
             #! 在什么时候允许用户输入 k 比较合适
-            align_list = smith_waterm_topk(query_dict['query_value'], query_dict['target_value'])
+            align_list = smith_waterm_topk(query_dict['query_value'], query_dict['target_value'], top_k, match, mismatch, gap)
             end_time = time.time()
 
             print("Run Time:", (end_time - start_time) * 1e6, "μs")
