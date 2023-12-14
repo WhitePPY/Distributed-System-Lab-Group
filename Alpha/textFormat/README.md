@@ -1,4 +1,4 @@
-#### this dir is for users to convinently transform their data into the format our framework is using
+#### This dir is for users to conveniently transform their data into the format our framework is using
 
 usage:  python .\data_transform.py (regex expression) (input_filename) (output_filename)
 
