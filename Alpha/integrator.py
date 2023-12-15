@@ -18,7 +18,7 @@ def process_message(message):
 def main():
     
     File1 = 'input.fna'
-    File2 = './GCF_001742465.1_ASM174246v1_genomic.fna'
+    File2 = 'GCF_001742465.1_ASM174246v1_genomic.fna'
     server_ip = '10.141.0.' + sys.argv[1][5:] + ':9092'
     key_num1  = 0
     for item1 in read_fasta(File1):

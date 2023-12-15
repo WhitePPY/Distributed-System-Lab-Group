@@ -7,8 +7,8 @@ import sys
 def file_to_kafka(topic):
     server_ip = '10.141.0.' + sys.argv[1][5:] + ':9092'
     producer = KafkaProducer(bootstrap_servers=server_ip)
-    File1 = '/home/dsys2313/slurm_test/input.fna'
-    File2 = '/home/dsys2313/slurm_test/GCF_001742465.1_ASM174246v1_genomic.fna'
+    File1 = 'input.fna'
+    File2 = 'GCF_001742465.1_ASM174246v1_genomic.fna'
     send_list = []
 
     for item1 in read_fasta(File1):
