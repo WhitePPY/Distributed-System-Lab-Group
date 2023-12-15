@@ -42,8 +42,8 @@ def main():
                 formatted_message = process_message(message_value)
                 file.write(formatted_message)
                 file.flush()  # 确保每条消息都立即写入文件
-                if key_num1 == key_num2:
-                    break
+                # if key_num1 == key_num2:
+                #     break
     except KeyboardInterrupt:
         print("Terminated")
     finally:
