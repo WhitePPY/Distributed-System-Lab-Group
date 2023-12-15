@@ -12,4 +12,5 @@ export SPARK_HOME=/home/dsys2313/yuanhao/spark_test/spark-3.5.0-bin-hadoop3
 export PYSPARK_PYTHON=/var/scratch/dsys2313/miniconda3/bin/python
 
 # Start the PySpark application using srun
-$SPARK_HOME/bin/spark-submit  processor.py $1
+# $SPARK_HOME/bin/
+spark-submit  processor.py $1 $2
